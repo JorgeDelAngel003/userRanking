@@ -47,7 +47,7 @@
     <button type="button" class="btn btn-primary" onclick="findUser('userName','/findUserByName/')">Buscar por Nombre</button>
     <button type="button" class="btn btn-primary"  onclick="findUser('userVerified','/findUserByVerified/')">Buscar por Verificado</button>
     <button type="button" class="btn btn-primary" onclick="populateTableFromJSON(url)">Limpiar filtros</button>
-    <button type="button" class="btn btn-primary" onclick="window.location.href = 'http://sudoku-env.eba-2twmapaf.us-east-2.elasticbeanstalk.com';">All Users</button>
+    <button type="button" class="btn btn-primary" onclick="window.location.href = 'http://sudoku-env.eba-2twmapaf.us-east-2.elasticbeanstalk.com';">Register</button>
 </form>
 
 <table id="usersTable" class="table table-dark table-striped">
@@ -173,7 +173,7 @@
         let hardCell = row.children.item(8);
         if(verifiedCell.innerHTML === "Verified" || verifiedCell.innerHTML === "Not Verified"){}
         else{
-            alert("Ese valor de verificado no es posible :(");
+            alert("This verified value is not possible :(");
             return;
         }
         if(!rangeNumber(extremeCell.innerHTML,prevExtreme) || !rangeNumber(expertCell.innerHTML,prevExpert) || !rangeNumber(hardCell.innerHTML,prevHard) || accuracyCell.innerHTML < 0 || accuracyCell.innerHTML > 2.25){
@@ -191,7 +191,7 @@
             extreme : extremeCell.innerHTML,
             expert : expertCell.innerHTML,
             hard : hardCell.innerHTML,
-            score : (extremeCell.innerHTML*125+expertCell.innerHTML*25+hardCell.innerHTML*5)*(3-accuracyCell.innerHTML)
+            score : Math.trunc((extremeCell.innerHTML*125+expertCell.innerHTML*25+hardCell.innerHTML*5)*(3-accuracyCell.innerHTML))
         };
 
 
@@ -217,7 +217,7 @@
             })
             .then(userFromAPI => {
                 console.log('Success:', userFromAPI);
-                alert("El usuario " + userFromAPI.name + " fue editado correctamente :D");
+                alert("The username " + userFromAPI.name + " has been changed successfully :D");
                 populateTableFromJSON(url);
             })
             .catch(error => {
@@ -241,11 +241,11 @@
     }
 
     function deleteUserButton(id) {
-        if (confirm("Estas seguro de eliminar al usuario:"+id)) {
+        if (confirm("Are you sure that you want to delete username number: "+id+"?")) {
             deleteUser(id);
         } else {
 
-            console.log("No se ha eliminado al usuario");
+            console.log("Username "+id+" has not been deleted...");
         }
     }
 
@@ -268,6 +268,7 @@
             })
             .then(data => {
                 console.log('OK', data);
+                alert("User number "+id+" has been deleted succesfully! :D");
                 populateTableFromJSON(url);
             })
             .catch(error => {
@@ -286,19 +287,24 @@
         let num = element;
         if(num >= 0 && num <= 999){
             if(num % 1 > 0){
-                alert("Ingresaste un número decimal donde no se debe D:");
+                alert("You're trying to put a float number where you shouldn't D:");
                 return false;
             }else {
                 if (num >= prev) {
                     return true;
                 } else {
-                    alert("No puede disminuir el número de partidas D:");
+                    alert("You can't decrease the number of completed sudokus D:");
                     return false;
                 }
             }
         }else{
+            alert("The number that you're trying to put is less than 0 or greater than 999 :(");
             return false;
         }
+    }
+
+    function no_spaces(field){
+        field.value = field.value.replace(/ /g, "");
     }
 </script>
 
