@@ -23,21 +23,22 @@
             <label for="userCountry" class="form-label">Country:</label>
             <select class="form-control" id="userCountry">
                 <option selected disabled value="">Select your country</option>
-                <option value="DEU">Alemania</option>
                 <option value="ARG">Argentina</option>
-                <option value="BRA">Brasil</option>
-                <option value="CAN">Canadá</option>
+                <option value="AUS">Australia</option>
+                <option value="BRA">Brazil</option>
+                <option value="CAN">Canada</option>
                 <option value="CHN">China</option>
-                <option value="KOR">Corea del Sur</option>
-                <option value="ESP">España</option>
-                <option value="USA">Estados Unidos</option>
-                <option value="FRA">Francia</option>
+                <option value="FRA">France</option>
+                <option value="DEU">Germany</option>
                 <option value="IND">India</option>
-                <option value="ITA">Italia</option>
-                <option value="JAP">Japón</option>
-                <option value="MEX">México</option>
-                <option value="RUS">Rusia</option>
-                <option value="UK">Reino Unido</option>
+                <option value="ITA">Italy</option>
+                <option value="JPN">Japan</option>
+                <option value="KOR">South Korea</option>
+                <option value="MEX">Mexico</option>
+                <option value="RUS">Russia</option>
+                <option value="ESP">Spain</option>
+                <option value="GBR">United Kingdom</option>
+                <option value="USA">United States</option>
             </select>
         </div>
 
@@ -96,25 +97,25 @@
         const formUserHard = document.getElementById("userHard");
 
         if(noValue(formUserName) || noValue(formUserCountry) || noValue(formUserAccuracy) || noValue(formUserExtreme) || noValue(formUserExpert) || noValue(formUserHard)){
-            alert("Llena todos los campos correctamente por favor :D");
+            alert("Please, fill in all fields correctly :D");
             return;
         }else{
             const nameReg = /^[a-zA-Z\u00C0-\u017F\s]+$/;
             if (!nameReg.test(formUserName.value)) {
-                alert("El nombre de usuario ingresado no es válido :(");
+                alert("This username has special characters :(");
                 return;
             }
             if(formUserName.value.length < 5 || (formUserName.value.length === 5 && formUserName.value.charAt(formUserName.value.length - 1) === " ")){
-                alert("El nombre de usuario ingresado es muy corto pipipi");
+                alert("This username is too short to be registered :(");
                 return;
             }
             if(!rangeNumber(formUserExtreme) || !rangeNumber(formUserExpert) || !rangeNumber(formUserHard) || formUserAccuracy.value < 0 || formUserAccuracy.value >= 2.25){
-                alert("Estás ingresando números decimales o fuera de rango D:");
+                alert("Are you trying to put float, negative or massive numbers where you shouldn't? D:");
                 return;
             }
             let formUserScore = Math.trunc((formUserExtreme.value*125+formUserExpert.value*25+formUserHard.value*5)*(3-formUserAccuracy.value));
             if(formUserScore === 0){
-                alert("Este usuario no tiene partidas a rankear D:")
+                alert("You can't register a user who has never completed a sudoku D:")
                 return;
             }
             const apiUrl = "http://sudoku-env.eba-2twmapaf.us-east-2.elasticbeanstalk.com/users";
@@ -151,9 +152,9 @@
                 })
                 .then(userFromAPI => {
                     console.log('Success:', userFromAPI);
-                    if(userFromAPI.id === -1){alert("Este usuario ya existe");
+                    if(userFromAPI.id === -1){alert("This username already exist D:");
                     }else{
-                        alert("El usuario " + userFromAPI.name +" ha sido registrado correctamente :D");
+                        alert("Username " + userFromAPI.name +" has been succesfully registered! :D");
                     }
                     cleanScreen();
                 })
@@ -170,10 +171,10 @@
         let num = element.value;
         if(num >= 0 && num <= 999){
             if(num % 1 > 0){
-                console.log("Es un número decimal D:");
+                console.log("You are trying to put a float number D:");
                 return false;
             }else{
-                console.log("Es un número entero :D");
+                console.log("It's an integer number :D");
                 return true;
             }
         }else{
@@ -191,8 +192,8 @@
         checkbox.value = checkbox.checked ? "Verified" : "Not Verified";
     }
 
-    function no_spaces(s){
-        s.value = s.value.replace(/ /g, "");
+    function no_spaces(field){
+        field.value = field.value.replace(/ /g, "");
     }
 
 
