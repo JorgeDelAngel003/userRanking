@@ -23,21 +23,22 @@
             <label for="userCountry" class="form-label">Country:</label>
             <select class="form-control" id="userCountry">
                 <option selected disabled value="">Select your country</option>
-                <option value="DEU">Alemania</option>
                 <option value="ARG">Argentina</option>
-                <option value="BRA">Brasil</option>
-                <option value="CAN">Canadá</option>
+                <option value="AUS">Australia</option>
+                <option value="BRA">Brazil</option>
+                <option value="CAN">Canada</option>
                 <option value="CHN">China</option>
-                <option value="KOR">Corea del Sur</option>
-                <option value="ESP">España</option>
-                <option value="USA">Estados Unidos</option>
-                <option value="FRA">Francia</option>
+                <option value="FRA">France</option>
+                <option value="DEU">Germany</option>
                 <option value="IND">India</option>
-                <option value="ITA">Italia</option>
-                <option value="JAP">Japón</option>
-                <option value="MEX">México</option>
-                <option value="RUS">Rusia</option>
-                <option value="UK">Reino Unido</option>
+                <option value="ITA">Italy</option>
+                <option value="JPN">Japan</option>
+                <option value="KOR">South Korea</option>
+                <option value="MEX">Mexico</option>
+                <option value="RUS">Russia</option>
+                <option value="ESP">Spain</option>
+                <option value="GBR">United Kingdom</option>
+                <option value="USA">United States</option>
             </select>
         </div>
 
@@ -99,10 +100,16 @@
             alert("Please, fill in all fields correctly :D");
             return;
         }else{
-            const nameReg = /^[a-zA-Z\u00C0-\u017F\s]+$/;
+            const nameReg = /^[a-zA-Z0-9\s]+$/;
             if (!nameReg.test(formUserName.value)) {
                 alert("This username has special characters :(");
                 return;
+            }else{
+                const numbers = /^[^0-9]/;
+                if(!numbers.test(formUserName.value.charAt(0))){
+                    alert("Username must not have a number in the first position D:");
+                    return;
+                }
             }
             if(formUserName.value.length < 5 || (formUserName.value.length === 5 && formUserName.value.charAt(formUserName.value.length - 1) === " ")){
                 alert("This username is too short to be registered :(");
@@ -173,7 +180,7 @@
                 console.log("You are trying to put a float number D:");
                 return false;
             }else{
-                console.log("It's am integer number :D");
+                console.log("It's an integer number :D");
                 return true;
             }
         }else{
