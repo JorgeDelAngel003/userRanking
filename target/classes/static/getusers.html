@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All users from DB</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+
+<h2>Users Data</h2>
+<form>
+    <div class="mb-3 mt-3">
+        <label for="userCountry" class="form-label">Country:</label>
+        <select class="form-control" id="userCountry">
+            <option selected disabled value="">Select your country</option>
+            <option value="DEU">Alemania</option>
+            <option value="ARG">Argentina</option>
+            <option value="BRA">Brasil</option>
+            <option value="CAN">Canadá</option>
+            <option value="CHN">China</option>
+            <option value="KOR">Corea del Sur</option>
+            <option value="ESP">España</option>
+            <option value="USA">Estados Unidos</option>
+            <option value="FRA">Francia</option>
+            <option value="IND">India</option>
+            <option value="ITA">Italia</option>
+            <option value="JAP">Japón</option>
+            <option value="MEX">México</option>
+            <option value="RUS">Rusia</option>
+            <option value="UK">Reino Unido</option>
+        </select>
+    </div>
+    <div class="mb-3 mt-3">
+        <label for="userName" class="form-label">Username:</label>
+        <input type="text" class="form-control" id="userName" value="" maxlength="15" placeholder="Enter username" name="userName" onkeydown="no_spaces(this);" onkeyup="no_spaces(this);">
+    </div>
+    <div class="mb-3 mt-3">
+        <label class="form-check-label" for="userVerified">
+            Verified users
+        </label>
+        <input type="checkbox" class="form-check-input" id="userVerified" value="Not Verified" name="userVerified" onchange="changeCheckboxValue()">
+    </div>
+
+    <button type="button" class="btn btn-primary" onclick="findUser('userCountry','/findUserByCountry/')">Buscar por País</button>
+    <button type="button" class="btn btn-primary" onclick="findUser('userName','/findUserByName/')">Buscar por Nombre</button>
+    <button type="button" class="btn btn-primary"  onclick="findUser('userVerified','/findUserByVerified/')">Buscar por Verificado</button>
+    <button type="button" class="btn btn-primary" onclick="populateTableFromJSON(url)">Limpiar filtros</button>
+    <button type="button" class="btn btn-primary" onclick="window.location.href = 'http://sudoku-env.eba-2twmapaf.us-east-2.elasticbeanstalk.com';">Register</button>
+</form>
+
+<table id="usersTable" class="table table-dark table-striped">
+    <thead>
+    <tr>
+        <th>User Id</th>
+        <th>Country</th>
+        <th>Username</th>
+        <th>Verified</th>
+        <th>Average Errors</th>
+        <th>Total Score</th>
+        <th>No. Extreme</th>
+        <th>No. Expert</th>
+        <th>No. Hard</th>
+        <th>Options</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- Table body will be populated dynamically -->
+    </tbody>
+</table>
+
+<script>
+
+    // URL from which JSON data will be fetched
+    const url = "http://sudoku-env.eba-2twmapaf.us-east-2.elasticbeanstalk.com/users";
+
+    // Function to populate table from JSON data
+    async function populateTableFromJSON(url) {
+        cleanTableRows();
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const allUsersFromDB = await response.json();
+            const tableBody = document.querySelector("#usersTable tbody");
+            allUsersFromDB.forEach(user => {
+
+                const row = document.createElement("tr");
+                let idNumber = user.id;
+                row.innerHTML = `
+                    <td class="id">${idNumber}</td>
+                    <td contenteditable="false">${user.country}</td>
+                    <td contenteditable="false">${user.name}</td>
+                    <td contenteditable="false">${user.verified}</td>
+                    <td contenteditable="false">${user.accuracy}</td>
+                    <td contenteditable="false">${user.score}</td>
+                    <td contenteditable="false">${user.extreme}</td>
+                    <td contenteditable="false">${user.expert}</td>
+                    <td contenteditable="false">${user.hard}</td>
+                    <td><button type="button" class="btn btn-danger" id="${idNumber}" onclick="deleteUserButton(id)">Eliminar</button>
+                    <button type="button" class="btn btn-warning" id="${idNumber}" onclick="editUser(id)">Editar</button></td>
+                `;
+                row.setAttribute("id", idNumber);
+                tableBody.appendChild(row);
+            });
+        } catch (error) {
+            console.error('There was a problem with the fetch operation:', error);
+        }
+    }
+
+    // Call the function to populate table
+    populateTableFromJSON(url);
+
+    function editUser(buttonPressId) {
+        //obtener la row que fue llamada
+        let row = document.getElementById(buttonPressId);
+
+        let countryCell = row.children.item(1);
+        let nameCell = row.children.item(2);
+        let verifiedCell = row.children.item(3);
+        let accuracyCell = row.children.item(4);
+        let scoreCell = row.children.item(5);
+        let extremeCell = row.children.item(6);
+        let expertCell = row.children.item(7);
+        let hardCell = row.children.item(8);
+
+        let prevExtreme = extremeCell.innerHTML;
+        let prevExpert = expertCell.innerHTML;
+        let prevHard = hardCell.innerHTML;
+
+        //cambiar la propiedad contenteditable
+        countryCell.setAttribute("contenteditable", "false");
+        nameCell.setAttribute("contenteditable", "false");
+        verifiedCell.setAttribute("contenteditable", "true");
+        accuracyCell.setAttribute("contenteditable", "true");
+        scoreCell.setAttribute("contenteditable", "false");
+        extremeCell.setAttribute("contenteditable", "true");
+        expertCell.setAttribute("contenteditable", "true");
+        hardCell.setAttribute("contenteditable", "true");
+
+        //poner el cursor sobre la celda 1
+        row.children.item(1).focus();
+
+        //cambiar el texto y color del boton de editar por guardar
+        let editButton = row.children.item(9).children.item(1);
+        editButton.setAttribute("class","btn btn-success");
+        editButton.innerHTML = "Save";
+
+
+        //al presionar el botón de guardar mandar llamar al metodo saveUser(con los datos de la fila)
+        editButton.setAttribute("onClick","saveUser("+buttonPressId+","+prevExtreme+","+prevExpert+","+prevHard+")");
+
+    }
+
+    function saveUser(idButtonPress,prevExtreme,prevExpert,prevHard) {
+        console.log(prevExtreme);
+        console.log(prevExpert);
+        console.log(prevHard);
+        console.log(idButtonPress);
+
+        let row = document.getElementById(idButtonPress);
+
+        let idCell = row.children.item(0);
+        let countryCell = row.children.item(1);
+        let nameCell = row.children.item(2);
+        let verifiedCell = row.children.item(3);
+        let accuracyCell = row.children.item(4);
+        let scoreCell = row.children.item(5);
+        let extremeCell = row.children.item(6);
+        let expertCell = row.children.item(7);
+        let hardCell = row.children.item(8);
+        if(verifiedCell.innerHTML === "Verified" || verifiedCell.innerHTML === "Not Verified"){}
+        else{
+            alert("Ese valor de verificado no es posible :(");
+            return;
+        }
+        if(!rangeNumber(extremeCell.innerHTML,prevExtreme) || !rangeNumber(expertCell.innerHTML,prevExpert) || !rangeNumber(hardCell.innerHTML,prevHard) || accuracyCell.innerHTML < 0 || accuracyCell.innerHTML > 2.25){
+            return;
+        }
+        console.log("row.children.item(2)="+nameCell.innerHTML);
+
+
+        const UserUpdated = {
+            id : idCell.innerHTML,
+            country : countryCell.innerHTML,
+            name : nameCell.innerHTML,
+            verified : verifiedCell.innerHTML,
+            accuracy : accuracyCell.innerHTML,
+            extreme : extremeCell.innerHTML,
+            expert : expertCell.innerHTML,
+            hard : hardCell.innerHTML,
+            score : Math.trunc((extremeCell.innerHTML*125+expertCell.innerHTML*25+hardCell.innerHTML*5)*(3-accuracyCell.innerHTML))
+        };
+
+
+        const apiUrl = "http://sudoku-env.eba-2twmapaf.us-east-2.elasticbeanstalk.com/users";
+
+
+        // Configure the request
+        const requestOptions = {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(UserUpdated)
+        };
+
+        // Make the POST request
+        fetch(apiUrl, requestOptions)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(userFromAPI => {
+                console.log('Success:', userFromAPI);
+                alert("El usuario " + userFromAPI.name + " fue editado correctamente :D");
+                populateTableFromJSON(url);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Handle error here
+            });
+
+    }
+    function findUser(id,findPath){
+        cleanTableRows();
+        populateTableFromJSON(url+findPath+document.getElementById(id).value);
+    }
+
+    function cleanTableRows() {
+        var tableHeaderRowCount = 1;
+        var table = document.getElementById('usersTable');
+        var rowCount = table.rows.length;
+        for (var i = tableHeaderRowCount; i < rowCount; i++) {
+            table.deleteRow(tableHeaderRowCount);
+        }
+    }
+
+    function deleteUserButton(id) {
+        if (confirm("Estas seguro de eliminar al usuario:"+id)) {
+            deleteUser(id);
+        } else {
+
+            console.log("No se ha eliminado al usuario");
+        }
+    }
+
+    function deleteUser(id) {
+        const deleteUrl = "http://sudoku-env.eba-2twmapaf.us-east-2.elasticbeanstalk.com/users/delete-user-by-id?id="+id;
+        fetch(deleteUrl, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+                // Add any other headers if required
+            },
+            // You can include a request body if necessary
+            // body: JSON.stringify({ id: id })
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response;
+            })
+            .then(data => {
+                console.log('OK', data);
+                populateTableFromJSON(url);
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+                // Handle errors, show an error message, or retry the operation
+            });
+    }
+
+    function changeCheckboxValue(){
+        let checkbox = document.getElementById("userVerified");
+        checkbox.value = checkbox.checked ? "Verified" : "Not Verified";
+    }
+
+    function rangeNumber(element,prev){
+        console.log(prev);
+        let num = element;
+        if(num >= 0 && num <= 999){
+            if(num % 1 > 0){
+                alert("Ingresaste un número decimal donde no se debe D:");
+                return false;
+            }else {
+                if (num >= prev) {
+                    return true;
+                } else {
+                    alert("No puede disminuir el número de partidas D:");
+                    return false;
+                }
+            }
+        }else{
+            alert("El número ingresado es menor o mayor al rango definido :(");
+            return false;
+        }
+    }
+</script>
+
+</body>
+</html>

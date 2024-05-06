@@ -112,7 +112,7 @@
                 alert("Estás ingresando números decimales o fuera de rango D:");
                 return;
             }
-            let formUserScore = (formUserExtreme.value*125+formUserExpert.value*25+formUserHard.value*5)*(3-formUserAccuracy.value);
+            let formUserScore = Math.trunc((formUserExtreme.value*125+formUserExpert.value*25+formUserHard.value*5)*(3-formUserAccuracy.value));
             if(formUserScore === 0){
                 alert("Este usuario no tiene partidas a rankear D:")
                 return;

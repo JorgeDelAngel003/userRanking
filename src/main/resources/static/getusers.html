@@ -47,7 +47,7 @@
     <button type="button" class="btn btn-primary" onclick="findUser('userName','/findUserByName/')">Buscar por Nombre</button>
     <button type="button" class="btn btn-primary"  onclick="findUser('userVerified','/findUserByVerified/')">Buscar por Verificado</button>
     <button type="button" class="btn btn-primary" onclick="populateTableFromJSON(url)">Limpiar filtros</button>
-    <button type="button" class="btn btn-primary" onclick="window.location.href = 'http://sudoku-env.eba-2twmapaf.us-east-2.elasticbeanstalk.com';">All Users</button>
+    <button type="button" class="btn btn-primary" onclick="window.location.href = 'http://sudoku-env.eba-2twmapaf.us-east-2.elasticbeanstalk.com';">Register</button>
 </form>
 
 <table id="usersTable" class="table table-dark table-striped">
@@ -191,7 +191,7 @@
             extreme : extremeCell.innerHTML,
             expert : expertCell.innerHTML,
             hard : hardCell.innerHTML,
-            score : (extremeCell.innerHTML*125+expertCell.innerHTML*25+hardCell.innerHTML*5)*(3-accuracyCell.innerHTML)
+            score : Math.trunc((extremeCell.innerHTML*125+expertCell.innerHTML*25+hardCell.innerHTML*5)*(3-accuracyCell.innerHTML))
         };
 
 
@@ -297,6 +297,7 @@
                 }
             }
         }else{
+            alert("El número ingresado es menor o mayor al rango definido :(");
             return false;
         }
     }
